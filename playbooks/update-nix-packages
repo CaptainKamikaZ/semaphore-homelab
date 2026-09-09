@@ -1,19 +1,22 @@
 ---
 - name: Update NixOS using Channels
   hosts: all
-  gather_facts: false  # Disables fact gathering
+  gather_facts: false
   become: true
   tasks:
     - name: Update Nix channels
       ansible.builtin.raw: bash -c "nix-channel --update"
       changed_when: true
+      check_mode: false
 
     - name: Rebuild and switch NixOS system with upgrades
       ansible.builtin.raw: bash -c "nixos-rebuild switch --upgrade"
       register: rebuild_output
       changed_when: "'building the system configuration' in rebuild_output.stdout or 'switching to system configuration' in rebuild_output.stdout"
+      check_mode: false
 
     - name: Collect garbage and delete older generations
       ansible.builtin.raw: bash -c "nix-collect-garbage -d"
       register: gc_output
       changed_when: "'deleting' in gc_output.stdout"
+      check_mode: false
