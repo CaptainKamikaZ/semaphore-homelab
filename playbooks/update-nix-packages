@@ -1,0 +1,21 @@
+---
+- name: Update NixOS using Channels
+  hosts: nixos_servers
+  become: true
+  tasks:
+    - name: Update Nix channels
+      ansible.builtin.command:
+        cmd: nix-channel --update
+      changed_when: true
+
+    - name: Rebuild and switch NixOS system with upgrades
+      ansible.builtin.command:
+        cmd: nixos-rebuild switch --upgrade
+      register: rebuild_output
+      changed_when: "'building the system configuration' in rebuild_output.stderr or 'switching to system configuration' in rebuild_output.stdout"
+
+    - name: Collect garbage and delete older generations
+      ansible.builtin.command:
+        cmd: nix-collect-garbage -d
+      register: gc_output
+      changed_when: "'deleting' in gc_output.stdout or 'deleting' in gc_output.stderr"
