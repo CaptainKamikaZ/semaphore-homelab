@@ -1,7 +1,10 @@
 ---
 - name: Update NixOS using Channels
-  hosts: nixos_servers
+  hosts: all
+  gather_facts: false
   become: true
+  vars:
+    ansible_executable: /run/current-system/sw/bin/bash
   tasks:
     - name: Update Nix channels
       ansible.builtin.command:
