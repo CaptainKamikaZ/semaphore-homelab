@@ -3,6 +3,8 @@
   hosts: all
   gather_facts: false
   become: true
+  vars:
+    ansible_ssh_timeout: 1800
   tasks:
     - name: Update Nix channels
       ansible.builtin.raw: bash -c "nix-channel --update"
@@ -11,8 +13,6 @@
 
     - name: Rebuild and switch NixOS system with upgrades
       ansible.builtin.raw: bash -c "nixos-rebuild switch --upgrade"
-      async: 1800
-      poll: 10
       register: rebuild_output
       changed_when: "'building the system configuration' in rebuild_output.stdout or 'switching to system configuration' in rebuild_output.stdout"
       check_mode: false
