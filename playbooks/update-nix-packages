@@ -6,6 +6,12 @@
   vars:
     ansible_ssh_timeout: 1800
   tasks:
+    - name: Collect garbage and delete older generations
+      ansible.builtin.raw: bash -c "nix-collect-garbage -d"
+      register: gc_output
+      changed_when: "'deleting' in gc_output.stdout"
+      check_mode: false
+
     - name: Update Nix channels
       ansible.builtin.raw: bash -c "nix-channel --update"
       changed_when: true
@@ -15,10 +21,4 @@
       ansible.builtin.raw: bash -c "nixos-rebuild switch --upgrade"
       register: rebuild_output
       changed_when: "'building the system configuration' in rebuild_output.stdout or 'switching to system configuration' in rebuild_output.stdout"
-      check_mode: false
-
-    - name: Collect garbage and delete older generations
-      ansible.builtin.raw: bash -c "nix-collect-garbage -d"
-      register: gc_output
-      changed_when: "'deleting' in gc_output.stdout"
       check_mode: false
