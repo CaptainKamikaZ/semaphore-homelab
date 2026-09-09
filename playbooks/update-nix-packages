@@ -7,7 +7,7 @@
     ansible_ssh_timeout: 1800
   tasks:
     - name: Collect garbage and delete older generations
-      ansible.builtin.raw: bash -c "nix-collect-garbage -d"
+      ansible.builtin.raw: bash -c "nix-collect-garbage --delete-older-than 14d"
       register: gc_output
       changed_when: "'deleting' in gc_output.stdout"
       check_mode: false
